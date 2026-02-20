@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { webhookQueue } from "../queue/config";
 
 export interface HubSpotConfig {

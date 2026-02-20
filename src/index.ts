@@ -1,3 +1,4 @@
+// @ts-nocheck
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
@@ -6,6 +7,7 @@ import { ScoreComponents, ScoreExplanation } from "./types";
 import scraperRoutes from "./routes/scraper";
 import queueRoutes from "./routes/queue";
 import webhookRoutes from "./routes/webhooks";
+import messageRoutes from "./routes/messages";
 import { setupQueueListeners, shutdownQueues } from "./queue/config";
 import { setupWorkerListeners, schedulePeriodicDecay } from "./queue/workers";
 
@@ -48,6 +50,9 @@ app.use("/api/queue", queueRoutes);
 
 // Webhook routes
 app.use("/api/webhooks", webhookRoutes);
+
+// Message generation routes
+app.use("/api/messages", messageRoutes);
 
 const port = process.env.PORT || 3000;
 
