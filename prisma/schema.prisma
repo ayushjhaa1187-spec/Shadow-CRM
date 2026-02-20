@@ -1,0 +1,214 @@
+// This is your Prisma schema file.
+// Learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Client account (the agency)
+model Client {
+  id            String   @id @default(cuid())
+  name          String
+  email         String   @unique
+  vertical      String   // "performance_marketing_agencies"
+  companySize   String   // "10-50", "50-200", etc
+  targetGeo     String[] // ["US", "UK", etc]
+  icpProfile    IcpProfile?
+  leads         Lead[]
+  signals       Signal[]
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@map("clients")
+}
+
+// Account info (prospect company)
+model Account {
+  id              String   @id @default(cuid())
+  name            String
+  domain          String   @unique
+  website         String?
+  industry        String?
+  companySize     Int?     // estimated headcount
+  revenue         String?  // revenue bracket
+  location        String?
+  lastScrapedAt   DateTime?
+
+  // ICP fit data
+  icpFitScore     Float    @default(0)
+
+  // Tech stack
+  techStack       TechStack?
+
+  // Hiring info
+  hiringSignals   HiringSignal[]
+
+  // Related data
+  leads           Lead[]
+  signals         Signal[]
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@map("accounts")
+}
+
+// Tech stack detection
+model TechStack {
+  id              String   @id @default(cuid())
+  accountId       String   @unique
+  account         Account  @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  // Ecom/platform
+  isShopify       Boolean  @default(false)
+  isWooCommerce   Boolean  @default(false)
+  isBigCommerce   Boolean  @default(false)
+
+  // Email/marketing
+  klaviyoDetected Boolean  @default(false)
+  mailchimpDetected Boolean @default(false)
+  klaviyoScore    Float    @default(0) // 0-1 confidence
+
+  // Analytics
+  googleAnalytics Boolean  @default(false)
+  mixpanelDetected Boolean @default(false)
+  amplitudeDetected Boolean @default(false)
+
+  // Ads
+  metaPixelDetected Boolean @default(false)
+  googleTagManager Boolean @default(false)
+
+  // Other
+  customTechs      String[] // JSON array of other detected tools
+
+  detectedAt      DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@map("tech_stacks")
+}
+
+// Hiring signals
+model HiringSignal {
+  id              String   @id @default(cuid())
+  accountId       String
+  account         Account  @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  jobTitle        String
+  jobLevel        String   // "manager", "lead", "director"
+  source          String   // "linkedin", "wellfound", "indeed"
+  jobUrl          String?
+
+  confidence      Float    @default(0.5) // 0-1
+  scrapedAt       DateTime @default(now())
+  decayFactor     Float    @default(1.0) // For scoring decay over time
+
+  @@map("hiring_signals")
+  @@index([accountId])
+}
+
+// Raw signal storage (website changes, ad activity, etc)
+model Signal {
+  id              String   @id @default(cuid())
+  clientId        String
+  client          Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  accountId       String
+  account         Account  @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  type            String   // "website_change", "hiring", "ad_activity", "funding", "tech_change"
+  subType         String   // "new_landing_page", "rebrand", "new_blog"
+
+  rawData         Json     // Raw signal data
+  confidence      Float    @default(0.5)
+  weight          Float    @default(1.0)
+
+  decayValue      Float    @default(1.0) // Decayed weight based on age
+  detectedAt      DateTime
+  createdAt       DateTime @default(now())
+
+  @@map("signals")
+  @@index([accountId])
+  @@index([clientId])
+}
+
+// Lead (prospect)
+model Lead {
+  id              String   @id @default(cuid())
+  clientId        String
+  client          Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  accountId       String
+  account         Account  @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  // Scoring
+  icpFitScore     Float    @default(0)   // 0-100
+  intentScore     Float    @default(0)   // 0-100
+  timingScore     Float    @default(0)   // 0-100
+  momentumScore   Float    @default(0)   // 0-100
+  finalScore      Float    @default(0)   // 0-100
+
+  tier            String   @default("C") // A, B, C
+
+  // Explanation of why this lead
+  scoreBreakdown  Json     // Detailed scoring breakdown
+  signalContext   Json     // Why now? Which signals drove this?
+
+  // Message suggestion
+  suggestedMessage String?
+  messageSignals  Json?    // Which signals informed the message
+
+  // Status
+  status          String   @default("new") // "new", "contacted", "replied", "qualified", "lost"
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@map("leads")
+  @@index([clientId])
+  @@index([accountId])
+  @@index([finalScore])
+  @@index([tier])
+}
+
+// ICP Profile (inferred from client)
+model IcpProfile {
+  id              String   @id @default(cuid())
+  clientId        String   @unique
+  client          Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  // Industry
+  industryMatch   String[] // ["performance_marketing", "ecommerce"]
+  industryScore   Float    @default(0)
+
+  // Size
+  minEmployees    Int?
+  maxEmployees    Int?
+  sizeScore       Float    @default(0)
+
+  // Geography
+  geoMatch        String[] // ["US", "UK"]
+  geoScore        Float    @default(0)
+
+  // Revenue
+  minRevenue      String?
+  maxRevenue      String?
+  revenueScore    Float    @default(0)
+
+  // Tech stack requirements
+  requiredTechs   String[] // ["shopify", "klaviyo"]
+  preferredTechs  String[]
+  techScore       Float    @default(0)
+
+  // Overall ICP fit threshold
+  minimumFitScore Float    @default(65)
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@map("icp_profiles")
+}
