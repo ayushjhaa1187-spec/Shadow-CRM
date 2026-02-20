@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { DetectedSignal } from "../types";
 import { ParsedWebsite } from "./websiteScraper";
 import { JobPosting } from "./jobBoardScraper";

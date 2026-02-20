@@ -5,6 +5,7 @@ import { computeLeadScore } from "./scoring";
 import { ScoreComponents, ScoreExplanation } from "./types";
 import scraperRoutes from "./routes/scraper";
 import queueRoutes from "./routes/queue";
+import webhookRoutes from "./routes/webhooks";
 import { setupQueueListeners, shutdownQueues } from "./queue/config";
 import { setupWorkerListeners, schedulePeriodicDecay } from "./queue/workers";
 
@@ -44,6 +45,9 @@ app.use("/api/scrape", scraperRoutes);
 
 // Queue routes
 app.use("/api/queue", queueRoutes);
+
+// Webhook routes
+app.use("/api/webhooks", webhookRoutes);
 
 const port = process.env.PORT || 3000;
 
