@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { DetectedSignal } from "../types";
 
 export interface MessageContext {

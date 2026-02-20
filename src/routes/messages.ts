@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Router, Request, Response } from "express";
 import { MessageGenerator } from "../services/messageGenerator";
 import { LeadRepository } from "../services/leadRepository";

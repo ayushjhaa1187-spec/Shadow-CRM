@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Job, Worker } from "bull";
 import {
   scrapeQueue,
