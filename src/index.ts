@@ -1,71 +1,47 @@
-import express, { Express, Request, Response, NextFunction } from "express";
+import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
+import { computeLeadScore } from "./scoring";
+import { ScoreComponents, ScoreExplanation } from "./types";
+import scraperRoutes from "./routes/scraper";
+import { CompanyScraperOrchestrator } from "./scrapers/orchestrator";
 
 dotenv.config();
 
-import { prisma } from "./lib/prisma";
-
-// Import routes
-import leadRoutes from "./routes/leads";
-import accountRoutes from "./routes/accounts";
-import clientRoutes from "./routes/clients";
-
-const app: Express = express();
-const PORT = process.env.PORT || 3000;
-
-// Middleware
+const app = express();
 app.use(cors());
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
 
-// Request logging
-app.use((req: Request, res: Response, next: NextFunction) => {
-  console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
-  next();
+app.get("/health", (_req, res) => {
+  res.json({ status: "ok", time: new Date().toISOString() });
 });
 
-// Health check
-app.get("/health", (req: Request, res: Response) => {
-  res.json({ status: "ok", timestamp: new Date().toISOString() });
+app.post("/score", (req, res) => {
+  const { icpFit, intent, timing, momentum, explanation } = req.body || {};
+
+  const required = [icpFit, intent, timing, momentum];
+  if (required.some((v) => typeof v !== "number")) {
+    return res
+      .status(400)
+      .json({ error: "icpFit, intent, timing, momentum must be numbers (0-100)." });
+  }
+
+  const payload: ScoreComponents = { icpFit, intent, timing, momentum };
+  const expl: Partial<ScoreExplanation> = explanation || {};
+  const scored = computeLeadScore(payload, expl);
+  return res.json(scored);
 });
 
-// Routes
-app.use("/api/leads", leadRoutes);
-app.use("/api/accounts", accountRoutes);
-app.use("/api/clients", clientRoutes);
+// Scraper routes
+app.use("/api/scrape", scraperRoutes);
 
-// 404 handler
-app.use((req: Request, res: Response) => {
-  res.status(404).json({ error: "Not found" });
-});
+const port = process.env.PORT || 3000;
 
-// Error handler
-app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
-  console.error("Error:", err);
-  res.status(500).json({
-    error: "Internal server error",
-    message: process.env.NODE_ENV === "development" ? err.message : undefined,
+// Local dev server; Vercel will handle serverless export instead.
+if (process.env.VERCEL !== "1") {
+  app.listen(port, () => {
+    console.log(`Shadow CRM API listening on ${port}`);
   });
-});
-
-// Graceful shutdown
-process.on("SIGINT", async () => {
-  console.log("Shutting down gracefully...");
-  await prisma.$disconnect();
-  process.exit(0);
-});
-
-process.on("SIGTERM", async () => {
-  console.log("Shutting down gracefully...");
-  await prisma.$disconnect();
-  process.exit(0);
-});
-
-// Start server
-const server = app.listen(PORT, () => {
-  console.log(`🚀 Shadow CRM API running on http://localhost:${PORT}`);
-  console.log(`Environment: ${process.env.NODE_ENV}`);
-});
+}
 
 export default app;

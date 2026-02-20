@@ -21,7 +21,7 @@ router.get("/:id", async (req: Request, res: Response) => {
     // Get signal summary
     const signalSummary = await SignalRepository.getSignalSummary(id);
 
-    res.json({
+    return res.json({
       success: true,
       data: {
         ...account,
@@ -30,7 +30,7 @@ router.get("/:id", async (req: Request, res: Response) => {
     });
   } catch (error) {
     console.error("Error getting account:", error);
-    res.status(500).json({ error: "Failed to get account" });
+    return res.status(500).json({ error: "Failed to get account" });
   }
 });
 
@@ -50,7 +50,7 @@ router.get("/domain/:domain", async (req: Request, res: Response) => {
 
     const signalSummary = await SignalRepository.getSignalSummary(account.id);
 
-    res.json({
+    return res.json({
       success: true,
       data: {
         ...account,
@@ -59,7 +59,7 @@ router.get("/domain/:domain", async (req: Request, res: Response) => {
     });
   } catch (error) {
     console.error("Error getting account:", error);
-    res.status(500).json({ error: "Failed to get account" });
+    return res.status(500).json({ error: "Failed to get account" });
   }
 });
 
@@ -95,13 +95,13 @@ router.post("/", async (req: Request, res: Response) => {
       techStack,
     });
 
-    res.status(201).json({
+    return res.status(201).json({
       success: true,
       data: account,
     });
   } catch (error) {
     console.error("Error creating account:", error);
-    res.status(500).json({ error: "Failed to create account" });
+    return res.status(500).json({ error: "Failed to create account" });
   }
 });
 
@@ -131,14 +131,14 @@ router.get("/", async (req: Request, res: Response) => {
       limit: parseInt(limit as string),
     });
 
-    res.json({
+    return res.json({
       success: true,
       count: accounts.length,
       data: accounts,
     });
   } catch (error) {
     console.error("Error searching accounts:", error);
-    res.status(500).json({ error: "Failed to search accounts" });
+    return res.status(500).json({ error: "Failed to search accounts" });
   }
 });
 
@@ -153,17 +153,17 @@ router.get("/:id/signals", async (req: Request, res: Response) => {
 
     const signals = await SignalRepository.getSignalsByAccount(
       id,
-      parseInt(limit as string)
+      parseInt(limit as string),
     );
 
-    res.json({
+    return res.json({
       success: true,
       count: signals.length,
       data: signals,
     });
   } catch (error) {
     console.error("Error getting signals:", error);
-    res.status(500).json({ error: "Failed to get signals" });
+    return res.status(500).json({ error: "Failed to get signals" });
   }
 });
 
@@ -178,17 +178,17 @@ router.get("/:id/hiring-signals", async (req: Request, res: Response) => {
 
     const hiringSignals = await SignalRepository.getHiringSignalsByAccount(
       id,
-      parseInt(limit as string)
+      parseInt(limit as string),
     );
 
-    res.json({
+    return res.json({
       success: true,
       count: hiringSignals.length,
       data: hiringSignals,
     });
   } catch (error) {
     console.error("Error getting hiring signals:", error);
-    res.status(500).json({ error: "Failed to get hiring signals" });
+    return res.status(500).json({ error: "Failed to get hiring signals" });
   }
 });
 
@@ -201,17 +201,17 @@ router.get("/shopify-klaviyo", async (req: Request, res: Response) => {
     const { limit = "100" } = req.query;
 
     const accounts = await AccountRepository.getAccountsWithShopifyAndKlaviyo(
-      parseInt(limit as string)
+      parseInt(limit as string),
     );
 
-    res.json({
+    return res.json({
       success: true,
       count: accounts.length,
       data: accounts,
     });
   } catch (error) {
     console.error("Error getting accounts:", error);
-    res.status(500).json({ error: "Failed to get accounts" });
+    return res.status(500).json({ error: "Failed to get accounts" });
   }
 });
 
@@ -225,17 +225,17 @@ router.get("/stale", async (req: Request, res: Response) => {
 
     const accounts = await AccountRepository.getStaleAccounts(
       parseInt(daysWithoutScrape as string),
-      parseInt(limit as string)
+      parseInt(limit as string),
     );
 
-    res.json({
+    return res.json({
       success: true,
       count: accounts.length,
       data: accounts,
     });
   } catch (error) {
     console.error("Error getting stale accounts:", error);
-    res.status(500).json({ error: "Failed to get stale accounts" });
+    return res.status(500).json({ error: "Failed to get stale accounts" });
   }
 });
 

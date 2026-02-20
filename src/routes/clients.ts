@@ -30,10 +30,10 @@ router.post("/", async (req: Request, res: Response) => {
       vertical,
       companySize,
       targetGeo || [],
-      icpProfile
+      icpProfile,
     );
 
-    res.status(201).json({
+    return res.status(201).json({
       success: true,
       data: client,
     });
@@ -42,7 +42,7 @@ router.post("/", async (req: Request, res: Response) => {
     if (error.code === "P2002") {
       return res.status(400).json({ error: "Email already exists" });
     }
-    res.status(500).json({ error: "Failed to create client" });
+    return res.status(500).json({ error: "Failed to create client" });
   }
 });
 
@@ -63,7 +63,7 @@ router.get("/:id", async (req: Request, res: Response) => {
     // Get client statistics
     const stats = await ClientRepository.getClientStats(id);
 
-    res.json({
+    return res.json({
       success: true,
       data: {
         ...client,
@@ -72,7 +72,7 @@ router.get("/:id", async (req: Request, res: Response) => {
     });
   } catch (error) {
     console.error("Error getting client:", error);
-    res.status(500).json({ error: "Failed to get client" });
+    return res.status(500).json({ error: "Failed to get client" });
   }
 });
 
@@ -92,7 +92,7 @@ router.get("/email/:email", async (req: Request, res: Response) => {
 
     const stats = await ClientRepository.getClientStats(client.id);
 
-    res.json({
+    return res.json({
       success: true,
       data: {
         ...client,
@@ -101,7 +101,7 @@ router.get("/email/:email", async (req: Request, res: Response) => {
     });
   } catch (error) {
     console.error("Error getting client:", error);
-    res.status(500).json({ error: "Failed to get client" });
+    return res.status(500).json({ error: "Failed to get client" });
   }
 });
 
@@ -109,18 +109,18 @@ router.get("/email/:email", async (req: Request, res: Response) => {
  * GET /api/clients
  * Get all clients
  */
-router.get("/", async (req: Request, res: Response) => {
+router.get("/", async (_req: Request, res: Response) => {
   try {
     const clients = await ClientRepository.getAllClients();
 
-    res.json({
+    return res.json({
       success: true,
       count: clients.length,
       data: clients,
     });
   } catch (error) {
     console.error("Error getting clients:", error);
-    res.status(500).json({ error: "Failed to get clients" });
+    return res.status(500).json({ error: "Failed to get clients" });
   }
 });
 
@@ -141,7 +141,7 @@ router.patch("/:id", async (req: Request, res: Response) => {
       targetGeo,
     });
 
-    res.json({
+    return res.json({
       success: true,
       data: client,
     });
@@ -150,7 +150,7 @@ router.patch("/:id", async (req: Request, res: Response) => {
     if (error.code === "P2002") {
       return res.status(400).json({ error: "Email already exists" });
     }
-    res.status(500).json({ error: "Failed to update client" });
+    return res.status(500).json({ error: "Failed to update client" });
   }
 });
 
@@ -165,13 +165,13 @@ router.patch("/:id/icp", async (req: Request, res: Response) => {
 
     const updated = await ClientRepository.updateIcpProfile(id, icpProfile);
 
-    res.json({
+    return res.json({
       success: true,
       data: updated,
     });
   } catch (error) {
     console.error("Error updating ICP profile:", error);
-    res.status(500).json({ error: "Failed to update ICP profile" });
+    return res.status(500).json({ error: "Failed to update ICP profile" });
   }
 });
 
@@ -185,13 +185,13 @@ router.get("/:id/stats", async (req: Request, res: Response) => {
 
     const stats = await ClientRepository.getClientStats(id);
 
-    res.json({
+    return res.json({
       success: true,
       data: stats,
     });
   } catch (error) {
     console.error("Error getting stats:", error);
-    res.status(500).json({ error: "Failed to get stats" });
+    return res.status(500).json({ error: "Failed to get stats" });
   }
 });
 
@@ -205,13 +205,13 @@ router.delete("/:id", async (req: Request, res: Response) => {
 
     await ClientRepository.deleteClient(id);
 
-    res.json({
+    return res.json({
       success: true,
       message: "Client deleted",
     });
   } catch (error) {
     console.error("Error deleting client:", error);
-    res.status(500).json({ error: "Failed to delete client" });
+    return res.status(500).json({ error: "Failed to delete client" });
   }
 });
 

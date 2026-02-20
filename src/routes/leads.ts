@@ -1,7 +1,6 @@
 import { Router, Request, Response } from "express";
 import { LeadRepository } from "../services/leadRepository";
 import { AccountRepository } from "../services/accountRepository";
-import { ClientRepository } from "../services/clientRepository";
 import { SignalRepository } from "../services/signalRepository";
 
 const router = Router();
@@ -18,17 +17,17 @@ router.get("/:clientId", async (req: Request, res: Response) => {
     const leads = await LeadRepository.getLeadsByClient(
       clientId,
       tier as "A" | "B" | "C" | undefined,
-      parseInt(limit as string)
+      parseInt(limit as string),
     );
 
-    res.json({
+    return res.json({
       success: true,
       count: leads.length,
       data: leads,
     });
   } catch (error) {
     console.error("Error getting leads:", error);
-    res.status(500).json({ error: "Failed to get leads" });
+    return res.status(500).json({ error: "Failed to get leads" });
   }
 });
 
@@ -46,13 +45,13 @@ router.get("/:clientId/:leadId", async (req: Request, res: Response) => {
       return res.status(404).json({ error: "Lead not found" });
     }
 
-    res.json({
+    return res.json({
       success: true,
       data: lead,
     });
   } catch (error) {
     console.error("Error getting lead:", error);
-    res.status(500).json({ error: "Failed to get lead" });
+    return res.status(500).json({ error: "Failed to get lead" });
   }
 });
 
@@ -81,23 +80,23 @@ router.post("/:clientId", async (req: Request, res: Response) => {
     const lead = await LeadRepository.createLead(
       clientId,
       accountId,
-      signals.map(s => ({
+      signals.map((s) => ({
         type: s.type as any,
         subType: s.subType,
         confidence: s.confidence,
         weight: s.weight,
         data: s.rawData as any,
         detectedAt: s.detectedAt,
-      }))
+      })),
     );
 
-    res.status(201).json({
+    return res.status(201).json({
       success: true,
       data: lead,
     });
   } catch (error) {
     console.error("Error creating lead:", error);
-    res.status(500).json({ error: "Failed to create lead" });
+    return res.status(500).json({ error: "Failed to create lead" });
   }
 });
 
@@ -116,16 +115,16 @@ router.patch("/:leadId/status", async (req: Request, res: Response) => {
 
     const lead = await LeadRepository.updateLeadStatus(
       leadId,
-      status as "new" | "contacted" | "replied" | "qualified" | "lost"
+      status as "new" | "contacted" | "replied" | "qualified" | "lost",
     );
 
-    res.json({
+    return res.json({
       success: true,
       data: lead,
     });
   } catch (error) {
     console.error("Error updating lead status:", error);
-    res.status(500).json({ error: "Failed to update lead status" });
+    return res.status(500).json({ error: "Failed to update lead status" });
   }
 });
 
@@ -139,13 +138,13 @@ router.get("/:clientId/distribution", async (req: Request, res: Response) => {
 
     const distribution = await LeadRepository.getLeadTierDistribution(clientId);
 
-    res.json({
+    return res.json({
       success: true,
       data: distribution,
     });
   } catch (error) {
     console.error("Error getting distribution:", error);
-    res.status(500).json({ error: "Failed to get distribution" });
+    return res.status(500).json({ error: "Failed to get distribution" });
   }
 });
 
