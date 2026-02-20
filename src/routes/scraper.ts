@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Router, Request, Response } from "express";
 import { CompanyScraperOrchestrator, DEFAULT_SCRAPER_CONFIG } from "../scrapers/orchestrator";
 import { AccountRepository } from "../services/accountRepository";

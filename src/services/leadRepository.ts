@@ -1,5 +1,5 @@
 import { prisma } from "../lib/prisma";
-import { Lead, Account, Signal } from "@prisma/client";
+import { Lead, Account, Signal, Prisma } from "@prisma/client";
 import { LeadScoringEngine } from "./scoringEngine";
 import { ScoreExplanation, DetectedSignal } from "../types";
 
@@ -60,7 +60,7 @@ export class LeadRepository {
         momentumScore,
         finalScore: scoring.final,
         tier: scoring.tier,
-        scoreBreakdown: scoring.components,
+        scoreBreakdown: scoring.components as unknown as Prisma.InputJsonValue,
         signalContext: {
           signals: signals.map(s => ({
             type: s.type,
@@ -68,7 +68,7 @@ export class LeadRepository {
             confidence: s.confidence,
             detectedAt: s.detectedAt,
           })),
-        },
+        } as unknown as Prisma.InputJsonValue,
       },
     });
 
@@ -95,10 +95,13 @@ export class LeadRepository {
 
     const geoScore = LeadScoringEngine.scoreGeography(
       icpProfile.geoMatch,
-      account.location
+      account.location || undefined,
     );
 
-    const revenueScore = LeadScoringEngine.scoreRevenue(account.revenue, false);
+    const revenueScore = LeadScoringEngine.scoreRevenue(
+      account.revenue || undefined,
+      false,
+    );
 
     const detectedTechs = new Set<string>();
     if (account.techStack) {
