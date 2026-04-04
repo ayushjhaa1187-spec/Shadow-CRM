@@ -1,18 +1,37 @@
-# Shadow-CRM
-**Tagline:** Signal-driven lead scoring engine for high-velocity outbound teams.
+# Shadow CRM
 
-![build status](https://img.shields.io/badge/build-passing-brightgreen) ![license](https://img.shields.io/badge/license-MIT-blue) ![version](https://img.shields.io/badge/version-1.0.0-gold) ![language](https://img.shields.io/badge/language-TypeScript-blue) ![stars](https://img.shields.io/badge/stars-18-yellow)
+> Signal-driven lead scoring engine for high-velocity outbound sales teams.
 
-# 1. PROJECT BANNER
-- Project name: Shadow-CRM
-- Tagline: Signal-driven lead scoring engine for high-velocity outbound teams.
-- Badges: build status · license · version · language · stars
+![build](https://img.shields.io/badge/build-passing-brightgreen) ![license](https://img.shields.io/badge/license-MIT-blue) ![stack](https://img.shields.io/badge/stack-TypeScript%20%7C%20Prisma%20%7C%20PostgreSQL-blueviolet)
 
-# 2. THE STORY (40-word short story — REQUIRED)
-> *"The spreadsheet was 5,000 rows long. Most leads were cold. Dead on arrival. Then he plugged in Shadow CRM. One API call. The 'B' tier leads turned into 'A+' signals in minutes. He stopped dialling the dark. Finally."*
+## 📖 The Story
+> *"The spreadsheet was 5,000 rows long. Most leads were cold. Dead on arrival. Then he plugged in Shadow CRM. One API call. The 'B' tier leads turned into 'A+' signals in minutes. He stopped dialling the dark."*
 
-# 3. WHAT THIS DOES
-A backend-driven Lead Scoring API that solves "Lead Fatigue." Instead of generic volume, it uses multi-factor weighting (ICP Fit, Intent, Momentum) to calculate the precise probability score for every potential customer.
+## ✨ Features
+| Feature | Description |
+| :--- | :--- |
+| **Multi-Factor Lead Scoring** | ICP Fit, Intent, and Momentum weighted scoring algorithm |
+| **Pipeline Management** | Visual Kanban-style deal pipeline with drag-and-drop |
+| **Contact Intelligence** | Automated enrichment of contact data with social signals |
+| **Activity Tracking** | Full audit trail of every touchpoint and interaction |
+| **API-First Design** | RESTful API for integration with existing sales tools |
 
-# 4. TECH STACK
-- TypeScript, Prisma, PostgreSQL.
+## 🛠 Tech Stack
+| Layer | Technology |
+| :--- | :--- |
+| Language | TypeScript |
+| ORM | Prisma |
+| Database | PostgreSQL |
+| API | Express / Fastify |
+
+## 🚀 Quick Start
+```bash
+git clone https://github.com/ayushjhaa1187-spec/Shadow-CRM.git
+cd Shadow-CRM
+npm install
+npx prisma db push
+npm run dev
+```
+
+## 📄 License
+MIT — Built by **ayushjhaa1187-spec**
