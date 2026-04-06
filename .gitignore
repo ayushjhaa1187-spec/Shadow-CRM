@@ -1,13 +1,35 @@
+# Dependencies
 node_modules/
+.pnp
+.pnp.js
+
+# Build
 dist/
+.next/
+out/
+
+# Environment
 .env
 .env.local
 .env.*.local
-*.log
-.DS_Store
-.yarn/
-.pnp.*
+
+# IDE
 .idea/
 .vscode/
 *.swp
 *.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+
+# Misc
+.yarn/
+.vercel
+*.tsbuildinfo
+next-env.d.ts
+tmpclaude-*

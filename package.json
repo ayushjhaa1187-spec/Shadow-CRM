@@ -1,18 +1,24 @@
 {
-  "name": "shadow-crm-backend",
-  "version": "0.1.0",
-  "description": "Signal-driven lead generation engine for SMB outbound sales",
-  "main": "dist/index.js",
+  "name": "shadow-crm",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Signal-driven CRM for SMB outbound sales — built with Next.js, Supabase, and AI",
   "scripts": {
-    "dev": "ts-node src/index.ts",
-    "build": "tsc",
-    "start": "node dist/index.js",
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "backend:dev": "ts-node src/index.ts",
+    "backend:build": "tsc -p tsconfig.backend.json",
+    "backend:start": "node dist/index.js",
     "db:push": "prisma db push",
     "db:studio": "prisma studio",
     "db:seed": "ts-node src/seed.ts"
   },
   "dependencies": {
     "@prisma/client": "^5.7.1",
+    "@supabase/ssr": "^0.5.2",
+    "@supabase/supabase-js": "^2.47.10",
     "axios": "^1.6.2",
     "bull": "^4.11.5",
     "cheerio": "^1.0.0-rc.12",
@@ -20,15 +26,25 @@
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
     "joi": "^17.11.0",
+    "lucide-react": "^0.460.0",
+    "next": "^14.2.15",
     "prisma": "^5.7.1",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
     "redis": "^4.6.12",
-    "typescript": "^5.3.3"
+    "zod": "^3.23.8"
   },
   "devDependencies": {
     "@types/cheerio": "^0.22.31",
     "@types/cors": "^2.8.19",
     "@types/express": "^4.17.21",
     "@types/node": "^20.10.6",
-    "ts-node": "^10.9.2"
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.47",
+    "tailwindcss": "^3.4.14",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3"
   }
 }
